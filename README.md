@@ -1,2 +1,28 @@
-# TaskManagementFrontEnd
-TaskFlow is a sleek and interactive team-based task manager inspired by Discord’s UI. It allows users to organize tasks by project channels, assign priorities, track completion, and simulate team collaboration. Perfect for frontend practice or UI demos.
+# TaskFlow - Team Task Manager
+
+TaskFlow is a visually engaging, browser-based task manager that helps you organize tasks by channels and priorities. Inspired by Discord’s layout, it offers a familiar and user-friendly experience for managing tasks across teams or personal projects.
+
+## ✨ Features
+
+- 📁 Channel-based task organization (e.g., general, frontend, backend)
+- ✅ Task creation and completion toggling
+- 🔥 Priority selection (High, Medium, Low)
+- 👤 Assignee display (with avatars)
+- 📊 Live task counts per channel
+- 🗑️ Task deletion
+- ⌨️ Keyboard shortcut support (Enter to add tasks)
+- 💡 Animated task entries and responsive layout
+
+## 🖼️ Preview
+
+![TaskFlow Preview]((https://github.com/ahsinmemon/TaskManagementFrontEnd/blob/main/Screenshot%202025-07-12%20220829.png))
+
+## 🚀 Getting Started
+
+This project is purely frontend and requires no server or build tools.
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/ahsinmemon/taskmanagementfrontend.git
+cd taskflow-task-manager
