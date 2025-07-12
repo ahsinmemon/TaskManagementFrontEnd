@@ -15,7 +15,7 @@ TaskFlow is a visually engaging, browser-based task manager that helps you organ
 
 ## 🖼️ Preview
 
-![TaskFlow Preview](./Screenshot 2025-07-12 220901.png)
+![TaskFlow Preview](./Screenshot2025-07-12220901.png)
 
 ## 🚀 Getting Started
 
