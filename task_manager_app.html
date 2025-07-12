@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - Team Task Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #36393f;
+            color: #dcddde;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 240px;
+            background: #2f3136;
+            border-right: 1px solid #202225;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-header {
+            padding: 16px;
+            border-bottom: 1px solid #202225;
+            background: #5865f2;
+            color: white;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .channels-section {
+            flex: 1;
+            padding: 16px 8px;
+            overflow-y: auto;
+        }
+
+        .channel-category {
+            margin-bottom: 24px;
+        }
+
+        .category-header {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            color: #8e9297;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .category-header:hover {
+            color: #dcddde;
+        }
+
+        .category-icon {
+            margin-right: 8px;
+            font-size: 10px;
+        }
+
+        .channel-list {
+            margin-left: 8px;
+        }
+
+        .channel-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 12px;
+            margin: 2px 0;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #8e9297;
+        }
+
+        .channel-item:hover {
+            background: #393c43;
+            color: #dcddde;
+        }
+
+        .channel-item.active {
+            background: #5865f2;
+            color: white;
+        }
+
+        .channel-icon {
+            margin-right: 8px;
+            font-size: 16px;
+        }
+
+        .channel-name {
+            font-weight: 500;
+        }
+
+        .task-count {
+            margin-left: auto;
+            background: #ed4245;
+            color: white;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .channel-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #202225;
+            background: #36393f;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .channel-title {
+            display: flex;
+            align-items: center;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .channel-title .channel-icon {
+            margin-right: 8px;
+            color: #8e9297;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            background: #5865f2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .action-btn:hover {
+            background: #4752c4;
+        }
+
+        .action-btn.secondary {
+            background: #4f545c;
+        }
+
+        .action-btn.secondary:hover {
+            background: #5d6269;
+        }
+
+        /* Task Area */
+        .task-area {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            background: #36393f;
+        }
+
+        .task-input-container {
+            background: #40444b;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #202225;
+        }
+
+        .task-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: #dcddde;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 12px;
+            resize: vertical;
+            min-height: 40px;
+        }
+
+        .task-input::placeholder {
+            color: #72767d;
+        }
+
+        .input-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .priority-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .priority-btn {
+            padding: 4px 12px;
+            border-radius: 16px;
+            border: 1px solid #72767d;
+            background: transparent;
+            color: #72767d;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .priority-btn.high {
+            border-color: #ed4245;
+            color: #ed4245;
+        }
+
+        .priority-btn.medium {
+            border-color: #faa61a;
+            color: #faa61a;
+        }
+
+        .priority-btn.low {
+            border-color: #57f287;
+            color: #57f287;
+        }
+
+        .priority-btn.active {
+            background: currentColor;
+            color: white;
+        }
+
+        .add-task-btn {
+            background: #5865f2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .add-task-btn:hover {
+            background: #4752c4;
+        }
+
+        .add-task-btn:disabled {
+            background: #4f545c;
+            cursor: not-allowed;
+        }
+
+        /* Task List */
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .task-item {
+            background: #2f3136;
+            border-radius: 8px;
+            padding: 16px;
+            border-left: 4px solid #5865f2;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .task-item:hover {
+            background: #32353b;
+            transform: translateX(4px);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+            border-left-color: #57f287;
+        }
+
+        .task-item.high-priority {
+            border-left-color: #ed4245;
+        }
+
+        .task-item.medium-priority {
+            border-left-color: #faa61a;
+        }
+
+        .task-item.low-priority {
+            border-left-color: #57f287;
+        }
+
+        .task-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .task-title {
+            font-weight: 600;
+            color: #dcddde;
+        }
+
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+
+        .task-action {
+            background: none;
+            border: none;
+            color: #8e9297;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .task-action:hover {
+            background: #40444b;
+            color: #dcddde;
+        }
+
+        .task-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #8e9297;
+            font-size: 12px;
+        }
+
+        .priority-badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .priority-high {
+            background: rgba(237, 66, 69, 0.2);
+            color: #ed4245;
+        }
+
+        .priority-medium {
+            background: rgba(250, 166, 26, 0.2);
+            color: #faa61a;
+        }
+
+        .priority-low {
+            background: rgba(87, 242, 135, 0.2);
+            color: #57f287;
+        }
+
+        .task-assignee {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .avatar {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #5865f2, #7289da);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 8px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 64px 24px;
+            color: #8e9297;
+        }
+
+        .empty-state h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #dcddde;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .task-item {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #2f3136;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #202225;
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #36393f;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="server-header">
+                TaskFlow Workspace
+            </div>
+            <div class="channels-section">
+                <div class="channel-category">
+                    <div class="category-header">
+                        <span class="category-icon">▼</span>
+                        <span>Projects</span>
+                    </div>
+                    <div class="channel-list">
+                        <div class="channel-item active" data-channel="general">
+                            <span class="channel-icon">#</span>
+                            <span class="channel-name">general</span>
+                            <span class="task-count">3</span>
+                        </div>
+                        <div class="channel-item" data-channel="frontend">
+                            <span class="channel-icon">#</span>
+                            <span class="channel-name">frontend</span>
+                            <span class="task-count">5</span>
+                        </div>
+                        <div class="channel-item" data-channel="backend">
+                            <span class="channel-icon">#</span>
+                            <span class="channel-name">backend</span>
+                            <span class="task-count">2</span>
+                        </div>
+                        <div class="channel-item" data-channel="design">
+                            <span class="channel-icon">#</span>
+                            <span class="channel-name">design</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="channel-category">
+                    <div class="category-header">
+                        <span class="category-icon">▼</span>
+                        <span>Personal</span>
+                    </div>
+                    <div class="channel-list">
+                        <div class="channel-item" data-channel="my-tasks">
+                            <span class="channel-icon">📋</span>
+                            <span class="channel-name">my-tasks</span>
+                            <span class="task-count">7</span>
+                        </div>
+                        <div class="channel-item" data-channel="completed">
+                            <span class="channel-icon">✅</span>
+                            <span class="channel-name">completed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="channel-header">
+                <div class="channel-title">
+                    <span class="channel-icon">#</span>
+                    <span id="current-channel">general</span>
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn secondary">Filter</button>
+                    <button class="action-btn">Members</button>
+                </div>
+            </div>
+
+            <div class="task-area">
+                <div class="task-input-container">
+                    <textarea class="task-input" placeholder="What needs to be done? Press Enter to add task..." id="taskInput"></textarea>
+                    <div class="input-actions">
+                        <div class="priority-selector">
+                            <button class="priority-btn low" data-priority="low">Low</button>
+                            <button class="priority-btn medium" data-priority="medium">Medium</button>
+                            <button class="priority-btn high" data-priority="high">High</button>
+                        </div>
+                        <button class="add-task-btn" id="addTaskBtn">Add Task</button>
+                    </div>
+                </div>
+
+                <div class="task-list" id="taskList">
+                    <!-- Sample tasks will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Task data structure
+        let tasks = {
+            general: [
+                { id: 1, title: "Review project requirements", priority: "high", assignee: "JS", completed: false, timestamp: Date.now() },
+                { id: 2, title: "Update documentation", priority: "medium", assignee: "AM", completed: false, timestamp: Date.now() },
+                { id: 3, title: "Schedule team meeting", priority: "low", assignee: "RK", completed: true, timestamp: Date.now() }
+            ],
+            frontend: [
+                { id: 4, title: "Implement responsive design", priority: "high", assignee: "JS", completed: false, timestamp: Date.now() },
+                { id: 5, title: "Add dark mode toggle", priority: "medium", assignee: "AM", completed: false, timestamp: Date.now() },
+                { id: 6, title: "Optimize loading performance", priority: "high", assignee: "RK", completed: false, timestamp: Date.now() },
+                { id: 7, title: "Fix mobile navigation", priority: "medium", assignee: "JS", completed: false, timestamp: Date.now() },
+                { id: 8, title: "Add animations", priority: "low", assignee: "AM", completed: false, timestamp: Date.now() }
+            ],
+            backend: [
+                { id: 9, title: "Set up database schema", priority: "high", assignee: "RK", completed: false, timestamp: Date.now() },
+                { id: 10, title: "Implement API endpoints", priority: "medium", assignee: "JS", completed: false, timestamp: Date.now() }
+            ],
+            design: [],
+            "my-tasks": [
+                { id: 11, title: "Complete code review", priority: "high", assignee: "You", completed: false, timestamp: Date.now() },
+                { id: 12, title: "Write unit tests", priority: "medium", assignee: "You", completed: false, timestamp: Date.now() },
+                { id: 13, title: "Update README", priority: "low", assignee: "You", completed: false, timestamp: Date.now() },
+                { id: 14, title: "Refactor components", priority: "medium", assignee: "You", completed: false, timestamp: Date.now() },
+                { id: 15, title: "Deploy to staging", priority: "high", assignee: "You", completed: false, timestamp: Date.now() },
+                { id: 16, title: "Fix bug in authentication", priority: "high", assignee: "You", completed: false, timestamp: Date.now() },
+                { id: 17, title: "Optimize queries", priority: "medium", assignee: "You", completed: false, timestamp: Date.now() }
+            ],
+            completed: []
+        };
+
+        let currentChannel = 'general';
+        let selectedPriority = null;
+        let taskIdCounter = 18;
+
+        // DOM elements
+        const taskInput = document.getElementById('taskInput');
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const taskList = document.getElementById('taskList');
+        const currentChannelSpan = document.getElementById('current-channel');
+        const channelItems = document.querySelectorAll('.channel-item');
+        const priorityBtns = document.querySelectorAll('.priority-btn');
+
+        // Event listeners
+        channelItems.forEach(item => {
+            item.addEventListener('click', () => switchChannel(item.dataset.channel));
+        });
+
+        priorityBtns.forEach(btn => {
+            btn.addEventListener('click', () => selectPriority(btn.dataset.priority));
+        });
+
+        addTaskBtn.addEventListener('click', addTask);
+        taskInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addTask();
+            }
+        });
+
+        // Functions
+        function switchChannel(channelName) {
+            currentChannel = channelName;
+            currentChannelSpan.textContent = channelName;
+            
+            // Update active channel
+            channelItems.forEach(item => {
+                item.classList.remove('active');
+                if (item.dataset.channel === channelName) {
+                    item.classList.add('active');
+                }
+            });
+            
+            renderTasks();
+        }
+
+        function selectPriority(priority) {
+            selectedPriority = selectedPriority === priority ? null : priority;
+            
+            priorityBtns.forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.dataset.priority === priority && selectedPriority) {
+                    btn.classList.add('active');
+                }
+            });
+        }
+
+        function addTask() {
+            const title = taskInput.value.trim();
+            if (!title) return;
+
+            const newTask = {
+                id: taskIdCounter++,
+                title: title,
+                priority: selectedPriority || 'medium',
+                assignee: 'You',
+                completed: false,
+                timestamp: Date.now()
+            };
+
+            tasks[currentChannel].push(newTask);
+            taskInput.value = '';
+            selectedPriority = null;
+            priorityBtns.forEach(btn => btn.classList.remove('active'));
+            
+            renderTasks();
+            updateTaskCounts();
+        }
+
+        function toggleTask(taskId) {
+            const task = tasks[currentChannel].find(t => t.id === taskId);
+            if (task) {
+                task.completed = !task.completed;
+                renderTasks();
+                updateTaskCounts();
+            }
+        }
+
+        function deleteTask(taskId) {
+            tasks[currentChannel] = tasks[currentChannel].filter(t => t.id !== taskId);
+            renderTasks();
+            updateTaskCounts();
+        }
+
+        function renderTasks() {
+            const channelTasks = tasks[currentChannel] || [];
+            
+            if (channelTasks.length === 0) {
+                taskList.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No tasks yet</h3>
+                        <p>Start by adding a task above. Keep your team organized<br>and productive with TaskFlow!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            taskList.innerHTML = channelTasks.map(task => `
+                <div class="task-item ${task.completed ? 'completed' : ''} ${task.priority}-priority">
+                    <div class="task-header">
+                        <div class="task-title">${task.title}</div>
+                        <div class="task-actions">
+                            <button class="task-action" onclick="toggleTask(${task.id})" title="${task.completed ? 'Mark incomplete' : 'Mark complete'}">
+                                ${task.completed ? '↩️' : '✅'}
+                            </button>
+                            <button class="task-action" onclick="deleteTask(${task.id})" title="Delete task">
+                                🗑️
+                            </button>
+                        </div>
+                    </div>
+                    <div class="task-meta">
+                        <span class="priority-badge priority-${task.priority}">${task.priority}</span>
+                        <div class="task-assignee">
+                            <div class="avatar">${task.assignee[0]}</div>
+                            <span>${task.assignee}</span>
+                        </div>
+                        <span>${formatTime(task.timestamp)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function updateTaskCounts() {
+            channelItems.forEach(item => {
+                const channelName = item.dataset.channel;
+                const count = tasks[channelName] ? tasks[channelName].filter(t => !t.completed).length : 0;
+                const countElement = item.querySelector('.task-count');
+                
+                if (count > 0) {
+                    if (countElement) {
+                        countElement.textContent = count;
+                    } else {
+                        item.insertAdjacentHTML('beforeend', `<span class="task-count">${count}</span>`);
+                    }
+                } else {
+                    if (countElement) {
+                        countElement.remove();
+                    }
+                }
+            });
+        }
+
+        function formatTime(timestamp) {
+            const now = new Date();
+            const date = new Date(timestamp);
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+
+            if (diffMins < 1) return 'just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Initialize
+        renderTasks();
+        updateTaskCounts();
+    </script>
+</body>
+</html>
